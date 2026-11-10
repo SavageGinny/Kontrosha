@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechStore - Интернет-магазин электроники и бытовой техники</title>
+    <meta name="description" content="Лучшие цены на смартфоны, ноутбуки, планшеты и другую электронику. Гарантия качества, доставка по всей России.">
+    <meta name="keywords" content="смартфоны, ноутбуки, электроника, техника, купить">
+    
+    <!-- CSS стили -->
+    <link rel="stylesheet" href="/static/css/bootstrap.min.css?v=5.3.0">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/css/custom.css?v=2.3.1">
+    <link rel="stylesheet" href="/static/css/responsive.css?v=1.5">
+    <link rel="stylesheet" href="/static/css/animations.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
+</head>
+<body class="home-page">
+    <!-- Header -->
+    <header class="header" id="main-header">
+        <div class="container-fluid">
+            <nav class="navbar navbar-expand-lg">
+                <a class="navbar-brand" href="/" title="TechStore - Главная страница">
+                    <img src="/static/images/logo-main.png" alt="TechStore Logo" width="150" height="45" class="logo-img">
+                </a>
+                
+                <div class="navbar-collapse">
+                    <ul class="navbar-nav main-menu">
+                        <li class="nav-item dropdown">
+                            <a href="/catalog/smartphones" class="nav-link dropdown-toggle" id="phones-dropdown">
+                                Смартфоны
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a href="/catalog/smartphones/apple" class="dropdown-item">Apple iPhone</a></li>
+                                <li><a href="/catalog/smartphones/samsung" class="dropdown-item">Samsung Galaxy</a></li>
+                                <li><a href="/catalog/smartphones/xiaomi" class="dropdown-item">Xiaomi</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog/laptops" id="laptops-link" class="nav-link">Ноутбуки</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/catalog/tablets" data-category="tablets" class="nav-link">Планшеты</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="https://blog.techstore.ru" target="_blank" rel="noopener" class="nav-link">Блог</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="/about" class="nav-link">О компании</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="header-actions">
+                    <a href="/search" class="search-btn">
+                        <i class="fa fa-search"></i>
+                    </a>
+                    <a href="/compare" class="compare-btn" data-count="3">
+                        <i class="fa fa-balance-scale"></i>
+                    </a>
+                    <a href="/wishlist" class="wishlist-btn">
+                        <i class="fa fa-heart"></i>
+                    </a>
+                    <a href="/cart" class="cart-btn" id="cart-button">
+                        <i class="fa fa-shopping-cart"></i>
+                        <span class="cart-count">2</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Banner -->
+    <section class="main-banner">
+        <div class="container">
+            <div class="banner-slider">
+                <div class="banner-slide active">
+                    <img src="/static/banners/summer-sale-2024.jpg" alt="Летние скидки до 50% на всю технику" class="banner-image">
+                    <div class="banner-content">
+                        <h1>Летние скидки до 50%</h1>
+                        <p>Только до 31 августа</p>
+                        <a href="/promo/summer-sale" class="btn btn-primary">Смотреть акции</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <main class="main-content">
+        <section class="featured-products">
+            <div class="container">
+                <h2 class="section-title">Популярные товары</h2>
+                
+                <div class="product-grid row">
+                    <!-- Product 1 -->
+                    <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-product-id="12345" data-category="smartphones">
+                        <div class="card">
+                            <div class="product-image">
+                                <img src="/products/images/iphone-14-pro-space-black.jpg" alt="iPhone 14 Pro 256GB Space Black" class="card-img-top">
+                                <div class="product-badges">
+                                    <span class="badge badge-new">Новинка</span>
+                                    <span class="badge badge-discount">-10%</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="product-title">
+                                    <a href="/product/12345-iphone-14-pro-256gb">iPhone 14 Pro 256GB</a>
+                                </h3>
+                                <div class="product-rating">
+                                    <span class="stars" style="--rating: 4.7;"></span>
+                                    <span class="reviews">(147 отзывов)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="current-price">89 990 ₽</span>
+                                    <span class="old-price">99 990 ₽</span>
+                                </div>
+                                <button class="btn btn-add-to-cart" data-product="12345">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    В корзину
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Product 2 -->
+                    <div class="col-lg-3 col-md-4 col-sm-6 product-card" data-product-id="12346" data-category="smartphones">
+                        <div class="card">
+                            <div class="product-image">
+                                <img src="/products/images/samsung-s23-ultra-green.jpg" alt="Samsung Galaxy S23 Ultra 512GB Green" class="card-img-top">
+                                <div class="product-badges">
+                                    <span class="badge badge-bestseller">Хит продаж</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h3 class="product-title">
+                                    <a href="/product/12346-samsung-galaxy-s23-ultra">Samsung Galaxy S23 Ultra</a>
+                                </h3>
+                                <div class="product-rating">
+                                    <span class="stars" style="--rating: 4.9;"></span>
+                                    <span class="reviews">(203 отзыва)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="current-price">79 990 ₽</span>
+                                </div>
+                                <button class="btn btn-add-to-cart" data-product="12346">
+                                    <i class="fa fa-shopping-cart"></i>
+                                    В корзину
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h4>Контакты</h4>
+                    <p>Email: <a href="mailto:support@techstore.ru">support@techstore.ru</a></p>
+                    <p>Телефон: <a href="tel:+78001234567">8-800-123-45-67</a></p>
+                </div>
+                <div class="col-md-4">
+                    <h4>Полезные ссылки</h4>
+                    <ul>
+                        <li><a href="/delivery">Доставка и оплата</a></li>
+                        <li><a href="/warranty">Гарантия и возврат</a></li>
+                        <li><a href="/credit">Кредит и рассрочка</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h4>Документы</h4>
+                    <ul>
+                        <li><a href="/privacy-policy.pdf">Политика конфиденциальности</a></li>
+                        <li><a href="/user-agreement.pdf">Пользовательское соглашение</a></li>
+                        <li><a href="/offer.pdf">Публичная оферта</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/jquery.min.js?v=3.6.0"></script>
+    <script src="/static/js/bootstrap.bundle.min.js?v=5.3.0"></script>
+    <script src="/static/js/main.js?v=2.1.4"></script>
+    <script src="/static/js/cart.js?v=1.2.1"></script>
+    
+    <!-- Analytics -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'GA_MEASUREMENT_ID');
+    </script>
+</body>
+</html>

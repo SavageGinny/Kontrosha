@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · Data Parser{% endblock %}
+{% block breadcrumb %}Ошибка{% endblock %}
+{% block content %}
+<div class="error-panel">
+    <div class="error-icon">!</div>
+    <div><strong>{{ title }}</strong><p>{{ message }}</p><a class="open-link" href="/">Вернуться на главную ↗</a></div>
+</div>
+{% endblock %}

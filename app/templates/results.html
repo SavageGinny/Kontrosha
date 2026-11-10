@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}{{ config.title }} · Data Parser{% endblock %}
+{% block breadcrumb %}<a href="/">Обзор</a> <span>/</span> {{ config.title }}{% endblock %}
+{% block content %}
+<div class="page-heading">
+    <div>
+        <a class="back-link" href="/">← Все парсеры</a>
+        <div class="eyebrow"><span class="eyebrow-line"></span> РЕЗУЛЬТАТЫ ОБРАБОТКИ</div>
+        <h1>{{ config.title }}</h1>
+        <p class="lead">{{ config.subtitle }}</p>
+    </div>
+    <div class="heading-icon {{ config.color }}">{{ config.icon }}</div>
+</div>
+
+<div class="metrics-row">
+    <div class="metric-card">
+        <span class="metric-label">НАЙДЕНО ЭЛЕМЕНТОВ</span>
+        <strong>{{ total }}</strong>
+        <span class="metric-note">Суммарно по всем заданиям</span>
+    </div>
+    <div class="metric-card">
+        <span class="metric-label">РАЗМЕР ИСТОЧНИКА</span>
+        <strong>{{ "{:,}".format(source_size).replace(",", " ") }} <small>симв.</small></strong>
+        <span class="metric-note">Прочитано из исходного файла</span>
+    </div>
+    <div class="metric-card">
+        <span class="metric-label">ИСХОДНЫЙ ФАЙЛ</span>
+        <strong class="metric-file">{{ filename }}</strong>
+        <span class="metric-note">Локальный источник данных</span>
+    </div>
+</div>
+
+{% if error %}
+<div class="error-panel">
+    <div class="error-icon">!</div>
+    <div><strong>Не удалось выполнить парсинг</strong><p>{{ error }}</p></div>
+</div>
+{% else %}
+<div class="results-header">
+    <div><h2>Результаты заданий</h2><p>Каждый блок соответствует отдельной задаче парсинга.</p></div>
+    <span class="result-count">{{ results|length }} ЗАДАНИЙ</span>
+</div>
+
+<div class="results-list">
+{% for title, value in results.items() %}
+    <details class="result-card" {% if loop.first %}open{% endif %}>
+        <summary>
+            <span class="task-number">{{ "%02d"|format(loop.index) }}</span>
+            <span class="task-title">{{ title }}</span>
+            <span class="task-count">
+                {% if value is mapping %}{{ value|length }} групп
+                {% elif value is sequence and value is not string %}{{ value|length }} записей
+                {% else %}результат{% endif %}
+            </span>
+            <span class="chevron">⌄</span>
+        </summary>
+        <div class="result-content">
+            {% if value is mapping and value %}
+                {% for key, item in value.items() %}
+                    <div class="nested-group">
+                        <div class="nested-title">{{ key }}</div>
+                        {% if item is mapping %}
+                            <pre>{{ item|tojson(indent=2) }}</pre>
+                        {% elif item is sequence and item is not string %}
+                            {% if item %}
+                            <ul class="value-list">
+                                {% for entry in item %}<li>{{ entry }}</li>{% endfor %}
+                            </ul>
+                            {% else %}<div class="empty-state">Совпадений не найдено</div>{% endif %}
+                        {% else %}
+                            <div class="value-text">{{ item }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            {% elif value is sequence and value is not string %}
+                {% if value %}
+                <ul class="value-list">
+                    {% for entry in value %}
+                        <li>
+                            {% if entry is mapping %}
+                                <pre>{{ entry|tojson(indent=2) }}</pre>
+                            {% else %}{{ entry }}{% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                    <div class="empty-state">Совпадений не найдено</div>
+                {% endif %}
+            {% else %}
+                <div class="value-text">{{ value }}</div>
+            {% endif %}
+        </div>
+    </details>
+{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

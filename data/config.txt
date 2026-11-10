@@ -1,0 +1,106 @@
+; =============================================
+; КОНФИГУРАЦИЯ ПРОИЗВОДСТВЕННОГО ОКРУЖЕНИЯ
+; Файл: production.config
+; Версия: 3.7.2
+; Дата изменения: 2024-05-28
+; =============================================
+
+[application]
+name = "ECommercePlatform"
+version = 3.7.2
+environment = production
+debug_mode = false
+log_level = INFO
+max_connections = 500
+timeout = 45.5
+session_lifetime = 7200
+cache_driver = redis
+queue_driver = rabbitmq
+maintenance_mode = false
+
+; Настройки локализации
+locale = ru_RU
+timezone = Europe/Moscow
+currency = RUB
+default_language = ru
+supported_languages = ru, en, de, fr
+
+[database]
+; Основная база данных
+primary_host = db-primary-cluster.example.com
+primary_port = 5432
+primary_username = app_prod_user_2024
+primary_password = Jh3@8k#mdPq!vRt9$%primary2024
+primary_database = ecommerce_production
+
+; Реплики для чтения
+replica_host_1 = db-replica-01.example.com
+replica_host_2 = db-replica-02.example.com  
+replica_port = 5432
+replica_username = app_readonly_user
+replica_password = read_only_pass_789!xyz
+
+; Параметры подключения
+pool_size = 50
+connection_timeout = 15.0
+max_retries = 3
+retry_delay = 2.5
+ssl_mode = require
+
+[cache]
+; Redis кластер
+redis_host_primary = redis-primary-cluster.example.com
+redis_host_replica = redis-replica-cluster.example.com
+redis_port = 6379
+redis_password = cache_prod_pass_123$%redis789
+default_ttl = 7200
+max_memory = 2gb
+key_prefix = prod_app
+
+; Memcached для сессий
+memcached_servers = memcached-01:11211,memcached-02:11211,memcached-03:11211
+memcached_username = memcache_user
+memcached_password = memcache_pass_456abc
+
+[external_apis]
+; Платежные системы
+payment_gateway_url = https://api.payment-service.com/v3/process
+payment_gateway_api_key = pay_live_sk_789xyz123abc456def789
+payment_gateway_secret = secret_live_987abc654def321ghi
+
+; СМС сервис
+sms_service_url = https://gateway.sms-provider.org/api/v2/send
+sms_service_token = sms_prod_token_987def654ghi321jkl
+sms_sender_name = ECOMMERCE
+
+; Email сервис
+email_service_url = https://api.mail-service.com/v1/messages
+email_service_key = mail_live_key_123xyz789abc
+email_from_address = no-reply@ecommerce-platform.com
+email_from_name = "Интернет-магазин"
+
+; CDN и хранилища
+cdn_url = https://cdn.ecommerce-platform.com
+cdn_secret_key = cdn_prod_secret_456mno123pqr
+storage_bucket = ecommerce-prod-assets
+storage_region = eu-central-1
+
+[security]
+; Настройки безопасности
+jwt_secret = jwt_prod_secret_very_long_key_2024_secure
+encryption_key = enc_prod_key_789xyz123abc456def
+cors_allowed_origins = https://ecommerce-platform.com,https://www.ecommerce-platform.com
+rate_limit_requests = 1000
+rate_limit_period = 3600
+password_min_length = 10
+password_require_special_chars = true
+
+[monitoring]
+; Мониторинг и логирование
+logstash_host = logstash-cluster.example.com
+logstash_port = 5044
+elasticsearch_host = es-cluster.example.com
+elasticsearch_port = 9200
+grafana_host = monitoring.example.com
+prometheus_port = 9090
+health_check_interval = 30

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Обзор · Data Parser{% endblock %}
+{% block breadcrumb %}Обзор{% endblock %}
+{% block content %}
+<section class="welcome">
+    <div>
+        <div class="eyebrow"><span class="eyebrow-line"></span> ИНСТРУМЕНТЫ АНАЛИЗА ДАННЫХ</div>
+        <h1>Центр <span>парсинга</span></h1>
+        <p class="lead">Выберите источник данных, чтобы запустить обработку и посмотреть результаты.</p>
+    </div>
+    <div class="welcome-art" aria-hidden="true">
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="core">&lt;/&gt;</div>
+        <span class="orbit-node node-one"></span><span class="orbit-node node-two"></span>
+        <span class="orbit-node node-three"></span>
+    </div>
+</section>
+
+<div class="section-heading">
+    <div>
+        <h2>Источники данных</h2>
+        <p>Четыре парсера · запуск по запросу</p>
+    </div>
+    <div class="section-count">04 <span>МОДУЛЯ</span></div>
+</div>
+
+<div class="parser-grid">
+    {% for card in cards %}
+    <article class="parser-card {{ card.color }}">
+        <div class="card-top">
+            <div class="parser-icon">{{ card.icon }}</div>
+            {% if card.exists %}
+                <span class="file-status ready"><i></i> Файл найден</span>
+            {% else %}
+                <span class="file-status missing"><i></i> Нет файла</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="card-kicker">МОДУЛЬ 0{{ loop.index }}</div>
+            <h3>{{ card.title }}</h3>
+            <p>{{ card.subtitle }}</p>
+        </div>
+        <div class="card-bottom">
+            <span class="filename">↳ {{ card.filename }}</span>
+            <a class="open-link" href="/parser/{{ card.key }}">Открыть <span>↗</span></a>
+        </div>
+    </article>
+    {% endfor %}
+</div>
+
+<div class="info-strip">
+    <div class="info-symbol">i</div>
+    <div>
+        <strong>Как это работает</strong>
+        <p>При открытии раздела приложение читает соответствующий файл, запускает Python-парсер и отображает найденные данные. Исходные файлы не изменяются.</p>
+    </div>
+</div>
+{% endblock %}
