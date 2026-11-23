@@ -1,111 +1,179 @@
-
 import re
-from bs4 import BeautifulSoup
-
 
 class HTMLParser():
 
     def __init__(self, parsed_text):
+        self.text = re.sub(
+            r'<!--.*?-->',
+            '',
+            parsed_text,
+            flags=re.DOTALL
+        )
+        self.tag_pattern = re.compile(
+            r'<([a-zA-Z][\w:-]*)\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>',
+            re.DOTALL
+        )
 
-        self.soup = BeautifulSoup(parsed_text, "html.parser")
-        self.text = self.soup.get_text(separator=" ", strip=True)
+        self.attr_pattern = re.compile(
+            r'([\w:-]+)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^\s>]+))'
+        )
 
+    def get_attributes(self, tag_text):
+        """Вспомогательный метод для извлечения атрибутов HTML-тега"""
+        attributes = {}
+
+        for match in self.attr_pattern.finditer(tag_text):
+            name = match.group(1).lower()
+            value = next(
+                (group for group in match.groups()[1:] if group is not None),
+                ""
+            )
+
+            attributes[name] = value
+
+        return attributes
 
     def href_urls(self):
-        """1. Извлечение всех URL из атрибутов href"""
+        """Извлечение всех URL из атрибутов href"""
         return sorted({
-            tag["href"]
-            for tag in self.soup.find_all(href=True)
+            attributes["href"]
+            for match in self.tag_pattern.finditer(self.text)
+            if (attributes := self.get_attributes(match.group(2))).get("href")
         })
 
     def src_urls(self):
-        """2. Извлечение всех URL из атрибутов src"""
+        """Извлечение всех URL из атрибутов src"""
         return sorted({
-            tag["src"]
-            for tag in self.soup.find_all(src=True)
+            attributes["src"]
+            for match in self.tag_pattern.finditer(self.text)
+            if (attributes := self.get_attributes(match.group(2))).get("src")
         })
-
 
     def anchor_text(self):
-        """3. Извлечение текста внутри тегов <a> (анкоры ссылок)"""
-        return [
-            tag.get_text(" ", strip=True)
-            for tag in self.soup.find_all("a")
-            if tag.get_text(strip=True)
-        ]
+        """Извлечение текста внутри тегов <a>"""
+        pattern = re.compile(
+            r'<a\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)</a\s*>',
+            re.DOTALL | re.IGNORECASE
+        )
 
-    def classes(self):
-        """4. Извлечение уникальных атрибутов class и их значений"""
-        return sorted({
-            (tag.name, tuple(tag.get("class")))
-            for tag in self.soup.find_all(class_=True)
-        })
+        result = []
 
-    def meta_tags(self):
-        """5. Извлечение мета-тегов (description и keywords)"""
-        result = {}
+        for match in pattern.finditer(self.text):
+            text = re.sub(r'<[^>]+>', '', match.group(2))
+            text = re.sub(r'\s+', ' ', text).strip()
 
-        for tag in self.soup.find_all("meta"):
-            name = tag.get("name", "").lower()
-
-            if name in ("description", "keywords"):
-                result[name] = tag.get("content", "")
+            if text:
+                result.append(text)
 
         return result
 
+    def classes(self):
+        """Извлечение уникальных атрибутов class и их значений"""
+        return sorted({
+            (
+                match.group(1).lower(),
+                tuple(attributes["class"].split())
+            )
+            for match in self.tag_pattern.finditer(self.text)
+            if (attributes := self.get_attributes(match.group(2))).get("class")
+        })
+
+    def meta_tags(self):
+        """Извлечение мета-тегов description и keywords"""
+        result = {}
+
+        for match in self.tag_pattern.finditer(self.text):
+            if match.group(1).lower() != "meta":
+                continue
+
+            attributes = self.get_attributes(match.group(2))
+
+            name = attributes.get("name", "").lower()
+
+            if name in ("description", "keywords"):
+                result[name] = attributes.get("content", "")
+
+        return result
 
     def data_attributes(self):
-        """6. Извлечение всех атрибутов, начинающихся с (data-*)"""
+        """Извлечение всех атрибутов, начинающихся с data-"""
         result = []
 
-        for tag in self.soup.find_all(True):
+        for match in self.tag_pattern.finditer(self.text):
+            tag_name = match.group(1).lower()
+            attributes = self.get_attributes(match.group(2))
 
             data = {
                 name: value
-                for name, value in tag.attrs.items()
+                for name, value in attributes.items()
                 if name.startswith("data-")
             }
 
             if data:
                 result.append({
-                    "tag": tag.name,
+                    "tag": tag_name,
                     "attributes": data
                 })
 
         return result
 
     def scripts_and_styles(self):
-        """7. Извлечение CSS-стилей и JavaScript-скриптов"""
-
-        # Извлекаем уникальные значения атрибутов style.
+        """Извлечение CSS-стилей и JavaScript-скриптов"""
         styles = sorted({
-            tag["style"]
-            for tag in self.soup.find_all(style=True)
+            attributes["style"]
+            for match in self.tag_pattern.finditer(self.text)
+            if (attributes := self.get_attributes(match.group(2))).get("style")
         })
 
-        # Извлекаем внешние скрипты и содержимое встроенных.
-        scripts = list(dict.fromkeys(
-            tag.get("src") or tag.get_text(strip=True)
-            for tag in self.soup.find_all("script")
-            if tag.get("src") or tag.get_text(strip=True)
-        ))
+        script_pattern = re.compile(
+            r'<script\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)</script\s*>',
+            re.DOTALL | re.IGNORECASE
+        )
+
+        scripts = []
+
+        for match in script_pattern.finditer(self.text):
+            attributes = self.get_attributes(match.group(1))
+            script = attributes.get("src") or match.group(2).strip()
+
+            if script:
+                scripts.append(script)
+
+        scripts = list(dict.fromkeys(scripts))
 
         return {
             "styles": styles,
             "scripts": scripts
         }
+
     def contacts(self):
-        """8. Поиск телефонных номеров и email в тексте"""
-        email_pattern = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
-        phone_pattern = r"(?<!\w)\+?\d[\d\s().-]{7,}\d(?!\w)"
-        emails = sorted(set(re.findall(email_pattern, self.text)))
-        phones = sorted(set(re.findall(phone_pattern, self.text)))
+        """Поиск телефонных номеров и email в тексте"""
+        text = re.sub(
+            r'<(script|style)\b[^>]*>.*?</\1\s*>',
+            ' ',
+            self.text,
+            flags=re.DOTALL | re.IGNORECASE
+        )
+
+        text = re.sub(r'<[^>]+>', ' ', text)
+
+        email_pattern = (
+            r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b'
+        )
+
+        phone_pattern = r'(?<!\w)\+?\d[\d\s().-]{7,}\d(?!\w)'
+
+        emails = sorted(set(re.findall(email_pattern, text)))
+        phones = sorted(set(re.findall(phone_pattern, text)))
+
         return {
             "emails": emails,
             "phones": phones
         }
 
+    
     def all(self):
+        """Общий метод для получения результатов всех заданий"""
         return {
             "1. URL из атрибутов href": self.href_urls(),
             "2. URL из атрибутов src": self.src_urls(),

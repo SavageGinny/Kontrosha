@@ -1,44 +1,77 @@
-
-import csv
+import re
 
 
 class DatabaseParser():
 
     def __init__(self, parsed_text):
-        reader = csv.DictReader(
-            parsed_text.splitlines(),
-            delimiter=";",
-            quotechar='"'
+        """ Регулярное выражение для извлечения полей CSV"""
+        
+        self.field_pattern = re.compile(
+            r'"((?:[^"]|"")*)"(?:;|$)'
         )
 
-        self.records = list(reader)
+        lines = [
+            line.strip()
+            for line in parsed_text.splitlines()
+            if line.strip()
+        ]
+
+        self.headers = self.parse_line(lines[0]) if lines else []
+
+        self.records = []
+
+        for line in lines[1:]:
+            values = self.parse_line(line)
+
+            if len(values) == len(self.headers):
+                self.records.append(dict(zip(self.headers, values)))
+
+
+    def parse_line(self, line):
+        """Вспомогательный метод для извлечения полей одной строки"""
+        return [
+            match.group(1).replace('""', '"')
+            for match in self.field_pattern.finditer(line)
+        ]
+
 
     def surnames(self):
-        """1. Извлечь все фамилии сотрудников"""
+        """Извлечение всех фамилий сотрудников"""
         return sorted({
-            r["last_name"] for r in self.records
+            r["last_name"]
+            for r in self.records
             if r.get("last_name")
         })
 
-    
     def domain_emails(self):
-        """2. Найти email-адреса в определенном домене"""
+        """Поиск email-адресов в определенном домене"""
         return sorted({
-            r["email"] for r in self.records
-            if r.get("email", "").lower().endswith("@company.com")
+            r["email"]
+            for r in self.records
+            if re.fullmatch(
+                r'[^@\s]+@company\.com',
+                r.get("email", ""),
+                re.IGNORECASE
+            )
         })
 
     def phones(self):
-        """3. Извлечь номера телефонов"""
+        """Извлечение номеров телефонов"""
         return sorted({
-            r["phone"] for r in self.records
-            if r.get("phone")
+            r["phone"]
+            for r in self.records
+            if re.fullmatch(
+                r'\+?[\d\s().-]+',
+                r.get("phone", "")
+            )
         })
 
+
     def employees_by_department(self):
-        """4. Найти сотрудников определенного отдела"""
+        """Поиск сотрудников определенного отдела"""
         departments = sorted({
-            r["department"] for r in self.records
+            r["department"]
+            for r in self.records
             if r.get("department")
         })
 
@@ -51,41 +84,49 @@ class DatabaseParser():
             for department in departments
         }
 
+    
     def skills(self):
-        """5. Извлечь навыки (skills) и разбить их по запятым"""
+        """Извлечение навыков и разделение их по запятым"""
         return {
             f'{r["last_name"]} {r["first_name"]}': [
                 skill.strip()
-                for skill in r.get("skills", "").split(",")
+                for skill in re.split(r'\s*,\s*', r.get("skills", ""))
                 if skill.strip()
             ]
             for r in self.records
         }
 
     def high_salary(self):
-        """6. Найти сотрудников с зарплатой выше 150000"""
+        """Поиск сотрудников с зарплатой выше 150000"""
         return [
             f'{r["last_name"]} {r["first_name"]}: {r["salary"]}'
             for r in self.records
-            if r.get("salary") and float(r["salary"]) > 150000
+            if re.fullmatch(r'\d+(?:\.\d+)?', r.get("salary", ""))
+            and float(r["salary"]) > 150000
         ]
 
-    # 
     def hire_dates(self):
-        """7. Извлечь даты приема на работу"""
+        """Извлечение дат приема на работу"""
         return {
             f'{r["last_name"]} {r["first_name"]}': r["hire_date"]
             for r in self.records
-            if r.get("hire_date")
+            if re.fullmatch(
+                r'\d{4}-\d{2}-\d{2}',
+                r.get("hire_date", "")
+            )
         }
 
-    # 
+    
     def managers(self):
-        """8. Найти руководителей (где manager_id = "NULL")"""
+        """Поиск руководителей (manager_id = "NULL")"""
         return [
             f'{r["last_name"]} {r["first_name"]} ({r["position"]})'
             for r in self.records
-            if r.get("manager_id", "").strip().upper() == "NULL"
+            if re.fullmatch(
+                r'NULL',
+                r.get("manager_id", "").strip(),
+                re.IGNORECASE
+            )
         ]
 
     def all(self):

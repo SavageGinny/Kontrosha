@@ -21,8 +21,8 @@ DATA_DIR = BASE_DIR / "data"
 SOURCE_FILES = {
     "logs": DATA_DIR / "logs.txt",
     "config": DATA_DIR / "config.txt",
-    "html": DATA_DIR / "index.html",
-    "database": DATA_DIR / "database.csv",
+    "html": DATA_DIR / "index.txt",
+    "database": DATA_DIR / "database.txt",
 }
 
 PARSERS = {
